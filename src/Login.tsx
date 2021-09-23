@@ -1,35 +1,68 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useState } from "react";
+
+const listaUsuarios = [
+  { usuario: "cuenta1", contraseña: "123" },
+  { usuario: "cuenta2", contraseña: "123" },
+];
 
 export default function Login() {
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const [usuarioActual, setUsuarioActual] = useState("");
+  const [datosActuales, setDatosActuales] = useState({
+    usuario: "",
+    contraseña: "",
+  });
 
-  if (isAuthenticated)
-    return (
-      <div>
-        <h2>No autorizado</h2>
-      </div>
-    );
+  const manejarCambioUsuario = (event: any) => {
+    const valor = event.target.value;
+    setDatosActuales({ ...datosActuales, usuario: valor });
+  };
+  const manejarCambioContraseña = (event: any) => {
+    const valor = event.target.value;
+    setDatosActuales({ ...datosActuales, contraseña: valor });
+  };
+
+  const login = () => {
+    const usuario = datosActuales.usuario;
+    const contraseña = datosActuales.contraseña;
+
+    listaUsuarios.forEach((item) => {
+      const usuarioCoincide = item.usuario == usuario;
+      const contraseñaCoincide = item.contraseña == contraseña;
+
+      if (usuarioCoincide && contraseñaCoincide) setUsuarioActual(item.usuario);
+    });
+  };
+
+  const logout = () => setUsuarioActual("");
 
   return (
-    <div style={styles.pageContainer}>
-      <div style={styles.contentContainer}>
-        <h1>KDSoft Login</h1>
-        <div style={styles.authContainer}>
-          <button
-            onClick={loginWithRedirect}
-            style={{ ...styles.loginButton, ...styles.google }}
-          >
-            Login con Google
-          </button>
-          <button
-            onClick={loginWithRedirect}
-            style={{ ...styles.loginButton, ...styles.github }}
-          >
-            Login con Github (test)
-          </button>
+    <>
+      {usuarioActual ? (
+        <div>
+          <h1>Hola {usuarioActual}</h1>
+          <button onClick={logout}>Cerrar sesión</button>
         </div>
-      </div>
-    </div>
+      ) : (
+        <>
+          <h1>KDSoft Login</h1>
+          <div style={styles.authContainer}>
+            <form>
+              <input onChange={manejarCambioUsuario} placeholder="Usuario" />
+              <input
+                onChange={manejarCambioContraseña}
+                placeholder="Contraseña"
+              />
+            </form>
+            <button
+              onClick={login}
+              style={{ ...styles.loginButton, ...styles.google }}
+            >
+              Login
+            </button>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
